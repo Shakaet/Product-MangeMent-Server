@@ -38,6 +38,61 @@ async function run() {
     const userCollection = database.collection("users");
 
 
+    app.get("/users/admin/:email",async(req,res)=>{
+
+      let email=req.params.email
+
+     
+      let query={email}
+      let user= await userCollection.findOne(query)
+
+      let admin=false
+      if(user){
+        admin= user?.role === "admin"
+      }
+
+      res.send({ admin })
+
+
+    })
+
+    app.get("/users/seller/:email",async(req,res)=>{
+
+      let email=req.params.email
+
+     
+      let query={email}
+      let user= await userCollection.findOne(query)
+
+      let seller=false
+      if(user){
+        seller= user?.role === "seller"
+      }
+
+      res.send({ seller })
+
+
+    })
+
+    app.get("/users/user/:email",async(req,res)=>{
+
+      let email=req.params.email
+
+     
+      let query={email}
+      let users= await userCollection.findOne(query)
+
+      let user=false
+      if(users){
+        user= users?.role === "user"
+      }
+
+      res.send({ user })
+
+
+    })
+
+
     app.get("/users",async(req,res)=>{
 
       let result= await userCollection.find().toArray()
