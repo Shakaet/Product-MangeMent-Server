@@ -59,6 +59,36 @@ async function run() {
   
     })
 
+
+    app.delete("/usersDeleted/:email",async(req,res)=>{
+
+      let email=req.params.email
+      console.log(email)
+
+      let query={email}
+
+      const result = await userCollection.deleteOne(query);
+
+      res.send(result)
+    })
+
+    app.patch("/users/adminDeletedReqSeller/:email",async(req,res)=>{
+
+      let email=req.params.email
+      // console.log(email)
+
+      let query ={email}
+
+      const updateDoc = {
+        $set: {
+          role: "user"
+        },
+      };
+      const result = await userCollection.updateOne(query, updateDoc);
+      res.send(result)
+  
+    })
+
     app.patch("/users/adminUpdateSeller/:email",async(req,res)=>{
 
       let email=req.params.email
