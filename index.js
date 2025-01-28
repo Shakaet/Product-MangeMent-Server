@@ -36,6 +36,34 @@ async function run() {
 
     const database = client.db("Product");
     const userCollection = database.collection("users");
+    const productCollection = database.collection("productsDb");
+
+
+
+    app.get("/allproduct",async(req,res)=>{
+
+      let result=await productCollection.find().toArray()
+      res.send(result)
+    })
+
+
+    app.get("/myaddedproduct/:email",async(req,res)=>{
+
+      let email=req.params.email
+
+      let query={email}
+      let result=await productCollection.find(query).toArray()
+      res.send(result)
+
+    })
+
+
+    app.post("/addproducts",async(req,res)=>{
+      let productsData=req.body
+      // console.log(productsData)
+      const result = await productCollection.insertOne(productsData);
+      res.send(result)
+    })
 
 
     app.get("/users/admin/:email",async(req,res)=>{
