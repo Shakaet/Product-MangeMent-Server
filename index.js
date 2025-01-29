@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
 })
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = "mongodb+srv://productUser:qFe5UCEpHNjQP21p@cluster0.bnqcs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -37,6 +37,109 @@ async function run() {
     const database = client.db("Product");
     const userCollection = database.collection("users");
     const productCollection = database.collection("productsDb");
+    const cartCollection = database.collection("CartDB");
+
+
+    app.get("/addtocart/:email",async(req,res)=>{
+
+      let email=req.params.email
+
+      let query={buyer_email:email}
+      let result=await cartCollection.find(query).toArray()
+      res.send(result)
+
+    })
+
+
+
+
+
+
+
+    app.post("/addtocart",async(req,res)=>{
+      let addToCartData=req.body
+      let product_id=addToCartData.product_Id
+
+      // console.log(product_id)
+
+      let filter={_id:new ObjectId(product_id)}
+
+      const updateDoc = {
+        $set: {
+          availability:false
+        },
+      };
+       await productCollection.updateOne(filter, updateDoc);  
+      const result = await cartCollection.insertOne(addToCartData);
+      res.send(result)
+    })
+
+    app.get("/allproducts",async(req,res)=>{
+
+     
+
+      const result = await productCollection.find().toArray();
+      res.send(result)
+
+
+    })
+
+
+
+
+    app.get("/product/:id",async(req,res)=>{
+
+      let idx=req.params.id
+
+      let query={_id:new ObjectId(idx)}
+
+      const result = await productCollection.findOne(query);
+      res.send(result)
+
+
+    })
+
+
+
+    app.patch("/product/:id",async(req,res)=>{
+
+
+      let upData=req.body
+      console.log(upData)
+
+      let idx=req.params.id
+
+      let filter={_id:new ObjectId(idx)}
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+            product_title: upData.product_title,
+            product_image:upData.product_image,
+            category: upData.category,
+            price: upData.price,
+            description:upData.description,
+            Specification:upData.Specification,
+            availability:upData.availability,
+            rating: upData.rating,
+        },
+      };
+
+      const result = await productCollection.updateOne(filter, updateDoc,options);
+      res.send(result)
+
+    })
+
+
+    app.delete("/product/:id",async(req,res)=>{
+
+      let idx=req.params.id
+
+      let query={_id:new ObjectId(idx)}
+
+      const result = await productCollection.deleteOne(query);
+      res.send(result)
+
+    })
 
 
 
